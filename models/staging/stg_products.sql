@@ -21,6 +21,7 @@ renamed as (
         cost
 
     from source
+    where name is not null
 
 )
 
