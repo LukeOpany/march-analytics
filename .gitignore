@@ -16,3 +16,4 @@ logs/
 __pycache__/
 *.pyc
 .python-version
+dbt_internal_packages/
