@@ -4,7 +4,7 @@ A dbt project analysing sales performance using the TheLook Ecommerce public dat
 
 ---
 
-## What was built
+## Overview
 
 - ✅ Project setup
 - ✅ Source registration
