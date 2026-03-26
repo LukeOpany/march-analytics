@@ -1,5 +1,18 @@
-dbt_packages/
-dbt_internal_packages/
-logs/
+cd ~/Desktop/dbt_march/march_analytics
+touch .gitignore
+```
+
+**Step 2 — Open it in VSCode and paste this in:**
+```
+# virtual environment
+venv/
+
+# dbt
 target/
-.env
+dbt_packages/
+logs/
+
+# python
+__pycache__/
+*.pyc
+.python-version
