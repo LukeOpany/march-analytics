@@ -191,3 +191,10 @@ dbt run
 - `date_trunc()` for time-based aggregations
 - `NULLIF()` to safely handle division by zero
 - Filtering out cancelled and returned orders for clean metrics
+
+---
+
+## Contributors
+
+- Luke Opany
+- Co-Authored-By: Claude Sonnet 4.6
