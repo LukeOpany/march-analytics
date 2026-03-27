@@ -6,12 +6,12 @@ A dbt project analysing sales performance using the TheLook Ecommerce public dat
 
 ## What was built
 
-- ✅ Project setup
-- ✅ Source registration
-- ✅ Staging models
-- ✅ Intermediate model
-- ✅ Marts model
-- ✅ Tests
+- Project setup
+- Source registration
+- Staging models
+- Intermediate model
+- Marts model
+- Tests
 
 ---
 
