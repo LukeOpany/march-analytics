@@ -1,4 +1,4 @@
-# March Analytics — dbt Project
+# March Analytics
 
 A dbt project analysing sales performance using the TheLook Ecommerce public dataset in BigQuery. Built with dbt Fusion, connected to Google BigQuery, and visualised in Looker Studio.
 
