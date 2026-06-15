@@ -1,110 +1,98 @@
 # March Analytics
 
-A dbt project analysing sales performance using the TheLook Ecommerce public dataset in BigQuery. Built with dbt Fusion, connected to Google BigQuery, and visualised in Looker Studio.
-
----
-
-## What was built
-
-- Project setup
-- Source registration
-- Staging models
-- Intermediate model
-- Marts model
-- Tests
-
----
-
-## Project Overview
-
-![Mind Map](images/mind_map.png)
-
----
-
-## Dashboard
+A dbt and BigQuery analytics engineering project that models TheLook Ecommerce data into a tested sales performance mart and Looker Studio dashboard.
 
 ![Sales Performance Dashboard](images/sales_performance_dashboard.png)
 
----
+## Problem
+
+Raw ecommerce tables are useful for storage, but awkward for business analysis. Sales questions usually require repeated joins across orders, order items, products, and customer attributes, plus careful filtering for cancelled or returned orders.
+
+This project builds a clean analytics layer that lets an analyst answer revenue, order volume, product, department, brand, and customer-segment questions from one final mart.
+
+## Dataset / Source
+
+The project uses the public BigQuery dataset `bigquery-public-data.thelook_ecommerce`.
+
+| Source table | Role in project |
+|---|---|
+| `orders` | Order status and timestamps |
+| `order_items` | Item-level sale price and order linkage |
+| `products` | Product category, brand, department, and cost |
+| `users` | Customer attributes available for segmentation |
+| `events` | Website activity available for future behavioral analysis |
+| `inventory_items` | Inventory and stock context |
+| `distribution_centers` | Warehouse and fulfillment context |
 
 ## Tech Stack
 
-| tool | purpose |
+| Tool | Purpose |
 |---|---|
-| dbt Fusion 2.0 | data transformation and modelling |
-| Google BigQuery | data warehouse |
-| Looker Studio | dashboard and visualisation |
-| Python 3.11 | virtual environment |
-| VSCode | development environment |
+| dbt Fusion 2.0 | SQL transformation and project structure |
+| Google BigQuery | Cloud data warehouse |
+| Looker Studio | Dashboard and visualization |
+| Python 3.11 | Local virtual environment |
+| Git / GitHub | Version control |
 
----
+## Architecture / Workflow
 
-## Data Source
-
-**BigQuery Public Dataset:** `bigquery-public-data.thelook_ecommerce`
-
-| table | description |
-|---|---|
-| `orders` | order-level data including status and timestamps |
-| `order_items` | individual line items with sale price per order |
-| `products` | product catalog with category, brand and cost |
-| `users` | customer data |
-| `events` | user website activity |
-| `inventory_items` | stock levels |
-| `distribution_centers` | warehouse locations |
-
----
+```mermaid
+flowchart LR
+    A[BigQuery public TheLook tables] --> B[dbt sources]
+    B --> C[Staging models]
+    C --> D[Intermediate enriched orders model]
+    D --> E[Sales performance mart]
+    E --> F[Looker Studio dashboard]
+```
 
 ## Project Structure
 
-```
-march_analytics/
-├── models/
-│   ├── staging/
-│   │   ├── sources.yml              # source definitions
-│   │   ├── schema.yml               # tests and documentation
-│   │   ├── stg_orders.sql           # cleaned orders
-│   │   ├── stg_order_items.sql      # cleaned order items
-│   │   └── stg_products.sql         # cleaned products
-│   ├── intermediate/
-│   │   └── int_orders_enriched.sql  # joined orders, items and products
-│   └── marts/
-│       └── mart_sales_performance.sql  # final sales metrics table
-├── macros/
-├── seeds/
-├── dbt_project.yml
-├── packages.yml
-└── README.md
+```text
+models/
+|-- staging/
+|   |-- sources.yml
+|   |-- schema.yml
+|   |-- stg_orders.sql
+|   |-- stg_order_items.sql
+|   `-- stg_products.sql
+|-- intermediate/
+|   `-- int_orders_enriched.sql
+`-- marts/
+    `-- mart_sales_performance.sql
 ```
 
----
+## Data Model
 
-## Data Lineage
+The final mart, `mart_sales_performance`, aggregates order-item data by time, product, order status, and customer gender.
 
-```
-bigquery-public-data.thelook_ecommerce
-    ├── orders          →  stg_orders
-    ├── order_items     →  stg_order_items    →  int_orders_enriched  →  mart_sales_performance
-    └── products        →  stg_products
-```
+Key metrics include:
 
----
+- `num_orders`
+- `num_items_sold`
+- `total_revenue`
+- `avg_item_price`
+- `avg_order_value`
+- `total_cost`
+- `total_profit`
 
-## Materializations
+Returned and cancelled orders are filtered out of the mart so dashboard metrics reflect completed commercial activity.
 
-| layer | type | reason |
-|---|---|---|
-| staging | view | lightweight, no storage cost |
-| intermediate | view | lightweight, no storage cost |
-| marts | table | fully materialised for fast dashboard queries |
+## Results / Hiring Evidence
 
----
+- Built a source-to-mart dbt workflow on BigQuery public ecommerce data.
+- Created staging models for orders, order items, and products.
+- Joined order, product, and customer fields into an intermediate enriched model.
+- Built a business-facing sales performance mart for dashboard consumption.
+- Added 12 dbt data quality tests across staging models.
+- Connected the final model to a Looker Studio sales dashboard.
 
-## Tests
+![Project Mind Map](images/mind_map.png)
 
-12 data quality tests are defined in `models/staging/schema.yml`:
+## Data Quality Tests
 
-| model | column | tests |
+12 data quality tests are defined in `models/staging/schema.yml`.
+
+| Model | Column | Tests |
 |---|---|---|
 | `stg_orders` | `order_id` | unique, not_null |
 | `stg_orders` | `user_id` | not_null |
@@ -115,42 +103,35 @@ bigquery-public-data.thelook_ecommerce
 | `stg_products` | `product_id` | unique, not_null |
 
 Run tests with:
+
 ```bash
-./venv/bin/dbt test
+dbt test
 ```
 
----
+## How to Run
 
-## Getting Started
+1. Clone the repository.
 
-### Prerequisites
-- Python 3.11
-- dbt Fusion 2.0
-- Google Cloud account with BigQuery access
-- A service account key file with BigQuery permissions
-
-### Setup
-
-**1. Clone the repository**
 ```bash
-git clone https://github.com/your-username/march_analytics.git
-cd march_analytics
+git clone https://github.com/LukeOpany/march-analytics.git
+cd march-analytics
 ```
 
-**2. Create and activate a virtual environment**
+2. Create and activate a virtual environment.
+
 ```bash
 python3.11 -m venv venv
 source venv/bin/activate
 ```
 
-**3. Install dbt-bigquery**
+3. Install the BigQuery adapter.
+
 ```bash
 pip install dbt-bigquery
 ```
 
-**4. Configure your profiles.yml**
+4. Configure `~/.dbt/profiles.yml`.
 
-Create `~/.dbt/profiles.yml` with the following:
 ```yaml
 march_analytics:
   target: dev
@@ -161,33 +142,31 @@ march_analytics:
       project: your-gcp-project-id
       dataset: dbt_march
       threads: 4
-      keyfile: /path/to/your/service-account-key.json
+      keyfile: /path/to/service-account-key.json
       location: US
 ```
 
-**5. Test the connection**
+5. Run and test the project.
+
 ```bash
 dbt debug
-```
-
-**6. Run the models**
-```bash
 dbt run
+dbt test
 ```
 
-**7. Run tests**
-```bash
-./venv/bin/dbt test
-```
+## What I Learned / Production Improvements
 
----
+This project demonstrates:
 
-## Key SQL Concepts Used
+- How to model ecommerce data into an analyst-friendly mart.
+- How to use dbt `source()` and `ref()` for lineage.
+- How to keep transformations modular with staging, intermediate, and mart layers.
+- How to make dashboard metrics more reliable by filtering non-completed orders.
 
-- CTEs (Common Table Expressions) for readable, modular SQL
-- `{{ source() }}` macro to reference raw BigQuery tables
-- `{{ ref() }}` macro to reference other dbt models
-- `LEFT JOIN` to enrich order items with product and order details
-- `date_trunc()` for time-based aggregations
-- `NULLIF()` to safely handle division by zero
-- Filtering out cancelled and returned orders for clean metrics
+Production next steps:
+
+- Add source freshness checks for upstream tables.
+- Add CI to run `dbt parse`, `dbt build`, and tests on pull requests.
+- Expand marts for customers, inventory, and acquisition funnel analysis.
+- Publish dbt docs for easier lineage review.
+- Parameterize deployment targets for dev/prod BigQuery datasets.
