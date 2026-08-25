@@ -32,7 +32,7 @@ final as (
         round(sum(sale_price) - sum(cost), 2)   as total_profit
 
     from enriched_orders
-    where order_status not in ('cancelled', 'returned')
+    where lower(order_status) not in ('cancelled', 'returned')
 
     group by 1, 2, 3, 4, 5, 6, 7, 8
 

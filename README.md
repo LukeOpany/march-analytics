@@ -59,6 +59,8 @@ models/
 |   `-- int_orders_enriched.sql
 `-- marts/
     `-- mart_sales_performance.sql
+tests/
+    `-- assert_mart_excludes_cancelled_and_returned_orders.sql
 ```
 
 ## Data Model
@@ -83,14 +85,14 @@ Returned and cancelled orders are filtered out of the mart so dashboard metrics 
 - Created staging models for orders, order items, and products.
 - Joined order, product, and customer fields into an intermediate enriched model.
 - Built a business-facing sales performance mart for dashboard consumption.
-- Added 12 dbt data quality tests across staging models.
+- Added 12 schema tests across staging models and a regression test for the final mart.
 - Connected the final model to a Looker Studio sales dashboard.
 
 ![Project Mind Map](images/mind_map.png)
 
 ## Data Quality Tests
 
-12 data quality tests are defined in `models/staging/schema.yml`.
+Twelve schema tests are defined in `models/staging/schema.yml`. A singular regression test in `tests/` confirms that cancelled and returned orders never reach the final mart.
 
 | Model | Column | Tests |
 |---|---|---|
@@ -101,6 +103,7 @@ Returned and cancelled orders are filtered out of the mart so dashboard metrics 
 | `stg_order_items` | `order_id` | not_null |
 | `stg_order_items` | `sale_price` | not_null |
 | `stg_products` | `product_id` | unique, not_null |
+| `mart_sales_performance` | `order_status` | excludes cancelled and returned orders |
 
 Run tests with:
 
